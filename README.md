@@ -1,4 +1,4 @@
-# ContactManger-Swift
+# ContactManager-Swift
 
 ## Features
  
