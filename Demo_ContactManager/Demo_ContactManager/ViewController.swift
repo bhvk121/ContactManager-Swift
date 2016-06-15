@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AVFoundation
 import Contacts
 
 class ViewController: UIViewController, UISearchResultsUpdating {
@@ -17,9 +18,19 @@ class ViewController: UIViewController, UISearchResultsUpdating {
 	
 	lazy var arrContacts = [CNContact]()
 	lazy var arrFilteredContacts = [CNContact]()
-
 	lazy var contactStore = CNContactStore()
 
+	var audioRecorder:AVAudioRecorder!
+	let audioSession = AVAudioSession.sharedInstance()
+
+	
+	let recordSettings = [AVSampleRateKey : NSNumber(float: Float(44100.0)),
+	                      AVFormatIDKey : NSNumber(int: Int32(kAudioFormatMPEG4AAC)),
+	                      AVNumberOfChannelsKey : NSNumber(int: 1),
+	                      AVEncoderAudioQualityKey : NSNumber(int: Int32(AVAudioQuality.Medium.rawValue))]
+
+	
+	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		checkforContactPermission()
@@ -29,6 +40,16 @@ class ViewController: UIViewController, UISearchResultsUpdating {
 	
 	
 	//MARK:- Custom Methods -
+	
+	func directoryURL(atIndex : Int) -> NSURL? {
+		let fileManager = NSFileManager.defaultManager()
+		let urls = fileManager.URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
+		let documentDirectory = urls[0] as NSURL
+		let soundURL = documentDirectory.URLByAppendingPathComponent("sound\"\(atIndex)\".m4a")
+		return soundURL
+	}
+	
+		
 	
 	func setRefreshControl() {
 		let refreshControl = UIRefreshControl()
@@ -130,6 +151,19 @@ class ViewController: UIViewController, UISearchResultsUpdating {
 		} else {
 			currentContact = arrContacts[indexPath.row]
 		}
+		
+		
+		do {
+			try audioSession.setCategory(AVAudioSessionCategoryPlayAndRecord)
+			try audioRecorder = AVAudioRecorder(URL: self.directoryURL(indexPath.row)!,
+			                                    settings: recordSettings)
+			
+			
+			cell.audioRecorder = audioRecorder
+		}
+		catch {
+		}
+		
 		
 		cell.IBlblName.text = "\(currentContact.givenName) \(currentContact.familyName)"
 		
