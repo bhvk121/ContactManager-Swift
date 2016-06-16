@@ -9,6 +9,12 @@
 import UIKit
 import AVFoundation
 
+protocol  ContactListTableViewCellProtocol {
+	func onRecordStart(activeRecorder : AVAudioRecorder?)
+	func onRecordStop(activeRecorder : AVAudioRecorder?)
+	func onPlayStart(activeRecorder : AVAudioRecorder?)
+	func onPlayStop(activeRecorder : AVAudioRecorder?)
+}
 
 class ContactListTableViewCell: UITableViewCell {
 	
@@ -16,12 +22,12 @@ class ContactListTableViewCell: UITableViewCell {
 	@IBOutlet var IBlblPhoneNumber: UILabel!
 	@IBOutlet var IBlblName: UILabel!
 	
+	var contactListTableViewCellDelegate : ContactListTableViewCellProtocol?
 	var audioPlayer : AVAudioPlayer?
-
-	var audioRecorder : AVAudioRecorder? {
-		didSet {
-			audioRecorder?.prepareToRecord()
-		}
+	var audioRecorder : AVAudioRecorder?
+	
+	override func awakeFromNib() {
+		
 	}
 	
 	//MARK:- IBActions -
@@ -40,53 +46,19 @@ class ContactListTableViewCell: UITableViewCell {
 	//MARK:- Custom methods -
 	
 	func stopPlaying() {
-		
-		if (audioRecorder != nil && audioRecorder?.recording == false){
-			do {
-				try audioPlayer = AVAudioPlayer(contentsOfURL: audioRecorder!.url)
-					audioPlayer?.stop()
-			} catch {
-			}
-		}
-		
+		contactListTableViewCellDelegate?.onPlayStop(audioRecorder)
 	}
 	
 	func startPlaying() {
-		
-		if (audioRecorder != nil && audioRecorder?.recording == false){
-			do {
-				try audioPlayer = AVAudioPlayer(contentsOfURL: audioRecorder!.url)
-					audioPlayer?.play()
-			} catch {
-			}
-		}
-		
+		contactListTableViewCellDelegate?.onPlayStart(audioRecorder)
 	}
 
 	func startRecording() {
-		
-		if audioRecorder?.recording == false {
-			let audioSession = AVAudioSession.sharedInstance()
-			do {
-				try audioSession.setActive(true)
-				audioRecorder?.record()
-			} catch {
-			}
-		}
-		
-		
+		contactListTableViewCellDelegate?.onRecordStart(audioRecorder)
 	}
 	
 	func stopRecording() {
-		
-		audioRecorder?.stop()
-		let audioSession = AVAudioSession.sharedInstance()
-		
-		do {
-			try audioSession.setActive(false)
-		} catch {
-		}
-		
+		contactListTableViewCellDelegate?.onRecordStop(audioRecorder)
 	}
 	
 	

@@ -10,27 +10,29 @@ import UIKit
 import AVFoundation
 import Contacts
 
-class ViewController: UIViewController, UISearchResultsUpdating {
+class ViewController: UIViewController, UISearchResultsUpdating, ContactListTableViewCellProtocol {
 	
 	@IBOutlet var IBtblViewContactList: UITableView!
-	
-	let searchController = UISearchController(searchResultsController: nil)
 	
 	lazy var arrContacts = [CNContact]()
 	lazy var arrFilteredContacts = [CNContact]()
 	lazy var contactStore = CNContactStore()
 
+	var soundFileURL:NSURL!
 	var audioRecorder:AVAudioRecorder!
+	var audioPlayer : AVAudioPlayer!
+
 	let audioSession = AVAudioSession.sharedInstance()
-
+	let searchController = UISearchController(searchResultsController: nil)
+	let recordSettings:[String : AnyObject] = [
+		AVFormatIDKey: NSNumber(unsignedInt:kAudioFormatAppleLossless),
+		AVEncoderAudioQualityKey : AVAudioQuality.Max.rawValue,
+		AVEncoderBitRateKey : 320000,
+		AVNumberOfChannelsKey: 2,
+		AVSampleRateKey : 44100.0
+	]
 	
-	let recordSettings = [AVSampleRateKey : NSNumber(float: Float(44100.0)),
-	                      AVFormatIDKey : NSNumber(int: Int32(kAudioFormatMPEG4AAC)),
-	                      AVNumberOfChannelsKey : NSNumber(int: 1),
-	                      AVEncoderAudioQualityKey : NSNumber(int: Int32(AVAudioQuality.Medium.rawValue))]
-
-	
-	
+	//MARK:- UIViewController Life Cycle -
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		checkforContactPermission()
@@ -38,19 +40,8 @@ class ViewController: UIViewController, UISearchResultsUpdating {
 		setRefreshControl()
 	}
 	
-	
-	//MARK:- Custom Methods -
-	
-	func directoryURL(atIndex : Int) -> NSURL? {
-		let fileManager = NSFileManager.defaultManager()
-		let urls = fileManager.URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
-		let documentDirectory = urls[0] as NSURL
-		let soundURL = documentDirectory.URLByAppendingPathComponent("sound\"\(atIndex)\".m4a")
-		return soundURL
-	}
-	
-		
-	
+	//MARK:- Screen setup -
+
 	func setRefreshControl() {
 		let refreshControl = UIRefreshControl()
 		refreshControl.addTarget(self, action: #selector(ViewController.refresh(_:)), forControlEvents: .ValueChanged)
@@ -63,30 +54,31 @@ class ViewController: UIViewController, UISearchResultsUpdating {
 		refreshControl.endRefreshing()
 	}
 	
-	
 	func setSearchController() {
-	  searchController.searchResultsUpdater = self
-	  searchController.dimsBackgroundDuringPresentation = false
-	  definesPresentationContext = false
-	  IBtblViewContactList.tableHeaderView = searchController.searchBar
+		searchController.searchResultsUpdater = self
+		searchController.dimsBackgroundDuringPresentation = false
+		definesPresentationContext = false
+		IBtblViewContactList.tableHeaderView = searchController.searchBar
 	}
 
+	//MARK:- Contact related methods -
+	
 	func checkforContactPermission() {
 		switch CNContactStore.authorizationStatusForEntityType(.Contacts) {
-		
-			case .Authorized:
-				fetchContacts()
-
-			case .NotDetermined:
-				contactStore.requestAccessForEntityType(.Contacts){succeeded, err in
-					guard err == nil && succeeded else{
-						return
+			
+		case .Authorized:
+			fetchContacts()
+			
+		case .NotDetermined:
+			contactStore.requestAccessForEntityType(.Contacts){succeeded, err in
+				guard err == nil && succeeded else{
+					return
 				}
 				self.fetchContacts()
-		}
-			default:
-				print("Not handled")
 			}
+		default:
+			print("Not handled")
+		}
 	}
 	
 	func fetchContacts() {
@@ -126,13 +118,62 @@ class ViewController: UIViewController, UISearchResultsUpdating {
 	}
 	
 	func filterContentForSearchText(searchText: String) {
-	  arrFilteredContacts = arrContacts.filter { contact in
-		return (contact.givenName.lowercaseString.containsString(searchText.lowercaseString) ||
-			contact.familyName.lowercaseString.containsString(searchText.lowercaseString))
-	  }
-			
+		arrFilteredContacts = arrContacts.filter { contact in
+			return (contact.givenName.lowercaseString.containsString(searchText.lowercaseString) ||
+				contact.familyName.lowercaseString.containsString(searchText.lowercaseString))
+		}
+		
 		IBtblViewContactList.reloadData()
 	}
+
+	
+	//MARK:- Audio related methods -
+	func getSoundURLForIndex(index : Int) -> NSURL {
+		
+		let dirPaths =
+			NSSearchPathForDirectoriesInDomains(.DocumentDirectory,
+			                                    .UserDomainMask, true)
+		let docsDir = dirPaths[0]
+		let soundFilePath = docsDir + "/sound\(index).m4a"
+		return NSURL(fileURLWithPath: soundFilePath)
+		
+	}
+	
+	func setSessionPlayAndRecord() {
+		let session = AVAudioSession.sharedInstance()
+		
+		do {
+			try session.setCategory(AVAudioSessionCategoryPlayAndRecord)
+		
+		} catch  {
+			print("could not set session category")
+		}
+		
+		do {
+			try session.setActive(true)
+		} catch  {
+			print("could not make session active")
+		}
+	}
+	
+	func recordWithPermission(setup:Bool) {
+		let session:AVAudioSession = AVAudioSession.sharedInstance()
+		// ios 8 and later
+		if (session.respondsToSelector(#selector(AVAudioSession.requestRecordPermission(_:)))) {
+			AVAudioSession.sharedInstance().requestRecordPermission({(granted: Bool)-> Void in
+				if granted {
+					print("Permission to record granted")
+					self.setSessionPlayAndRecord()
+				} else {
+					print("Permission to record not granted")
+				}
+			})
+		} else {
+			print("requestRecordPermission unrecognized")
+		}
+	}
+	
+	
 	
 	//MARK:- UITableView delegate -
 	
@@ -152,18 +193,19 @@ class ViewController: UIViewController, UISearchResultsUpdating {
 			currentContact = arrContacts[indexPath.row]
 		}
 		
+		cell.contactListTableViewCellDelegate = self
+		
+		//AVAudio related code
 		
 		do {
 			try audioSession.setCategory(AVAudioSessionCategoryPlayAndRecord)
-			try audioRecorder = AVAudioRecorder(URL: self.directoryURL(indexPath.row)!,
+			try audioRecorder = AVAudioRecorder(URL: getSoundURLForIndex(indexPath.row),
 			                                    settings: recordSettings)
-			
-			
 			cell.audioRecorder = audioRecorder
+			
 		}
 		catch {
 		}
-		
 		
 		cell.IBlblName.text = "\(currentContact.givenName) \(currentContact.familyName)"
 		
@@ -177,6 +219,7 @@ class ViewController: UIViewController, UISearchResultsUpdating {
 		// Set the contact image.
 		let intialFirst = currentContact.givenName.characters.first
 		let intialSecond = currentContact.familyName.characters.first
+		
 		
 		if let imageData = currentContact.imageData {
 			cell.IBViewProfilePic.setValueForProfile(true, imageData: imageData)
@@ -194,6 +237,46 @@ class ViewController: UIViewController, UISearchResultsUpdating {
 	func updateSearchResultsForSearchController(searchController: UISearchController) {
 		filterContentForSearchText(searchController.searchBar.text!)
 	}
+	
+	//MARK:- ContactListTableViewCellProtocol -
+	
+	func onRecordStop(activeRecorder: AVAudioRecorder?) {
+		activeRecorder?.stop()
+		let audioSession = AVAudioSession.sharedInstance()
+		
+		do {
+			try audioSession.setActive(false)
+		} catch {
+		}
+
+	}
+	
+	func onRecordStart(activeRecorder: AVAudioRecorder?) {
+		recordWithPermission(false)
+		activeRecorder?.prepareToRecord()
+		if activeRecorder?.recording == false {
+			let audioSession = AVAudioSession.sharedInstance()
+			do {
+				try audioSession.setActive(true)
+				activeRecorder?.record()
+			} catch {
+			}
+		}
+	}
+
+	func onPlayStart(activeRecorder: AVAudioRecorder?) {
+		if (activeRecorder != nil && activeRecorder?.recording == false){
+		AudioPlayerManager.audioPlayerSharedManager.playContent(activeRecorder!.url)
+		}
+	}
+	
+	func onPlayStop(activeRecorder: AVAudioRecorder?) {
+		if (activeRecorder != nil && activeRecorder?.recording == false){
+		AudioPlayerManager.audioPlayerSharedManager.stopContent(activeRecorder!.url)
+		}
+	}
+	
+	//MARK:- iOS delegate methods -
 	
 	override func didReceiveMemoryWarning() {
 		super.didReceiveMemoryWarning()

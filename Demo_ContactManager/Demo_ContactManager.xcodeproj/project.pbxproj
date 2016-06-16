@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B3B731F41D126C6C004DC959 /* AudioPlayerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3B731F31D126C6C004DC959 /* AudioPlayerManager.swift */; };
 		B3D107441D0A95900010E9C5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3D107431D0A95900010E9C5 /* AppDelegate.swift */; };
 		B3D107461D0A95900010E9C5 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3D107451D0A95900010E9C5 /* ViewController.swift */; };
 		B3D107491D0A95900010E9C5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B3D107471D0A95900010E9C5 /* Main.storyboard */; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B3B731F31D126C6C004DC959 /* AudioPlayerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioPlayerManager.swift; sourceTree = "<group>"; };
 		B3D107401D0A95900010E9C5 /* Demo_ContactManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Demo_ContactManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B3D107431D0A95900010E9C5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B3D107451D0A95900010E9C5 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -65,6 +67,7 @@
 				B3D1074A1D0A95900010E9C5 /* Assets.xcassets */,
 				B3D1074C1D0A95900010E9C5 /* LaunchScreen.storyboard */,
 				B3D1074F1D0A95900010E9C5 /* Info.plist */,
+				B3B731F31D126C6C004DC959 /* AudioPlayerManager.swift */,
 			);
 			path = Demo_ContactManager;
 			sourceTree = "<group>";
@@ -117,6 +120,7 @@
 				TargetAttributes = {
 					B3D1073F1D0A95900010E9C5 = {
 						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = 9MXB9EHJSS;
 					};
 				};
 			};
@@ -157,6 +161,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B3D107461D0A95900010E9C5 /* ViewController.swift in Sources */,
+				B3B731F41D126C6C004DC959 /* AudioPlayerManager.swift in Sources */,
 				B3D107D21D0ACE840010E9C5 /* CustomProfileView.swift in Sources */,
 				B3D107D01D0AC73B0010E9C5 /* ContactListTableViewCell.swift in Sources */,
 				B3D107441D0A95900010E9C5 /* AppDelegate.swift in Sources */,
@@ -272,10 +277,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = Demo_ContactManager/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.contactmanager.contactmanager.Demo-ContactManager";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
 		};
@@ -283,10 +291,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = Demo_ContactManager/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.contactmanager.contactmanager.Demo-ContactManager";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Release;
 		};
