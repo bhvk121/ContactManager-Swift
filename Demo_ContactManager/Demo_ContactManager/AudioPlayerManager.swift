@@ -15,21 +15,21 @@ class AudioPlayerManager: NSObject {
 	
 	var audioPlayer : AVAudioPlayer!
 	
-	func playContent(urlToPlay : NSURL) {
+	func playContent(_ urlToPlay : URL) {
 		
 		audioPlayer?.stop() //stop previous url if any
 		
 		do {
-			try audioPlayer = AVAudioPlayer(contentsOfURL: urlToPlay)
+			try audioPlayer = AVAudioPlayer(contentsOf: urlToPlay)
 			audioPlayer?.play()
 		} catch {
 			}
 	}
 	
 	
-	func stopContent(urlToStop : NSURL) {
+	func stopContent(_ urlToStop : URL) {
 		do {
-			try audioPlayer = AVAudioPlayer(contentsOfURL: urlToStop)
+			try audioPlayer = AVAudioPlayer(contentsOf: urlToStop)
 			audioPlayer?.stop()
 		} catch {
 		}

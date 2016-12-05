@@ -25,14 +25,14 @@ class CustomProfileView: UIView {
 	
 	var myFontSize: CGFloat = 50
 	var imageUrl: String?
-	var imageData: NSData?
+	var imageData: Data?
 	var imageView: UIImageView? {
 		didSet {
 			self.setNeedsDisplay()
 		}
 	}
 	
-	func setValueForProfile(animation: Bool, nameInitials: String = "N.A", fontSize: CGFloat = 30.0, imageData: NSData?) {
+	func setValueForProfile(_ animation: Bool, nameInitials: String = "N.A", fontSize: CGFloat = 30.0, imageData: Data?) {
 		isAnimated = animation
 		myNameInitials = nameInitials
 		myFontSize = fontSize
@@ -48,12 +48,12 @@ class CustomProfileView: UIView {
 		super.init(frame: frame)
 	}
 	
-	override func drawRect(rect: CGRect) {
+	override func draw(_ rect: CGRect) {
 			drawOvalWithText(placeHolderText: "\(myNameInitials)", rect: rect, fontSize: myFontSize, shouldAnimated: isAnimated )
 	}
 	
 
-    func drawOvalWithText(placeHolderText placeHolderText: String = "SA", rect: CGRect, fontSize: CGFloat = 50, shouldAnimated: Bool = true) {
+    func drawOvalWithText(placeHolderText: String = "SA", rect: CGRect, fontSize: CGFloat = 50, shouldAnimated: Bool = true) {
 		
 		let context = UIGraphicsGetCurrentContext()
 
@@ -62,25 +62,25 @@ class CustomProfileView: UIView {
 		
 		//// Oval Drawing
 		let ovalRect = rect
-		let ovalPath = UIBezierPath(ovalInRect: ovalRect)
+		let ovalPath = UIBezierPath(ovalIn: ovalRect)
 		color.setFill()
 		ovalPath.fill()
 		let ovalStyle = NSMutableParagraphStyle()
-		ovalStyle.alignment = .Center
+		ovalStyle.alignment = .center
 		
-		let ovalFontAttributes = [NSFontAttributeName: UIFont(name: "HelveticaNeue-Medium", size: fontSize)!, NSForegroundColorAttributeName: UIColor.whiteColor(), NSParagraphStyleAttributeName: ovalStyle]
+		let ovalFontAttributes = [NSFontAttributeName: UIFont(name: "HelveticaNeue-Medium", size: fontSize)!, NSForegroundColorAttributeName: UIColor.white, NSParagraphStyleAttributeName: ovalStyle]
 		
-		let ovalTextHeight: CGFloat = NSString(string: placeHolderText).boundingRectWithSize(CGSize(width: ovalRect.width, height: CGFloat.infinity), options: NSStringDrawingOptions.UsesLineFragmentOrigin, attributes: ovalFontAttributes, context: nil).size.height
-		CGContextSaveGState(context)
-		CGContextClipToRect(context, ovalRect)
-		NSString(string: placeHolderText).drawInRect(CGRect(x: ovalRect.minX, y: ovalRect.minY + (ovalRect.height - ovalTextHeight) / 2, width: ovalRect.width, height: ovalTextHeight), withAttributes: ovalFontAttributes)
-		CGContextRestoreGState(context)
+		let ovalTextHeight: CGFloat = NSString(string: placeHolderText).boundingRect(with: CGSize(width: ovalRect.width, height: CGFloat.infinity), options: NSStringDrawingOptions.usesLineFragmentOrigin, attributes: ovalFontAttributes, context: nil).size.height
+		context?.saveGState()
+		context?.clip(to: ovalRect)
+		NSString(string: placeHolderText).draw(in: CGRect(x: ovalRect.minX, y: ovalRect.minY + (ovalRect.height - ovalTextHeight) / 2, width: ovalRect.width, height: ovalTextHeight), withAttributes: ovalFontAttributes)
+		context?.restoreGState()
 		
 		if let imageData = imageData {
 			imageView = UIImageView(frame: rect)
 			imageView?.layer.cornerRadius = rect.width/2
 			imageView?.layer.masksToBounds = true
-			imageView?.contentMode = .ScaleAspectFill
+			imageView?.contentMode = .scaleAspectFill
 			self.addSubview(imageView!)
 			imageView?.image = UIImage(data: imageData)
 		} else {

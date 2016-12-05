@@ -121,6 +121,7 @@
 					B3D1073F1D0A95900010E9C5 = {
 						CreatedOnToolsVersion = 7.3;
 						DevelopmentTeam = 9MXB9EHJSS;
+						LastSwiftMigration = 0800;
 					};
 				};
 			};
@@ -284,6 +285,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.contactmanager.contactmanager.Demo-ContactManager";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -298,6 +300,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.contactmanager.contactmanager.Demo-ContactManager";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

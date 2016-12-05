@@ -10,10 +10,10 @@ import UIKit
 import AVFoundation
 
 protocol  ContactListTableViewCellProtocol {
-	func onRecordStart(activeRecorder : AVAudioRecorder?)
-	func onRecordStop(activeRecorder : AVAudioRecorder?)
-	func onPlayStart(activeRecorder : AVAudioRecorder?)
-	func onPlayStop(activeRecorder : AVAudioRecorder?)
+	func onRecordStart(_ activeRecorder : AVAudioRecorder?)
+	func onRecordStop(_ activeRecorder : AVAudioRecorder?)
+	func onPlayStart(_ activeRecorder : AVAudioRecorder?)
+	func onPlayStop(_ activeRecorder : AVAudioRecorder?)
 }
 
 class ContactListTableViewCell: UITableViewCell {
@@ -32,14 +32,14 @@ class ContactListTableViewCell: UITableViewCell {
 	
 	//MARK:- IBActions -
 	
-	@IBAction func IBbtnRecordTap(sender: UIButton) {
-		sender.selected = !sender.selected
-		sender.selected ? startRecording() : stopRecording()
+	@IBAction func IBbtnRecordTap(_ sender: UIButton) {
+		sender.isSelected = !sender.isSelected
+		sender.isSelected ? startRecording() : stopRecording()
 	}
 	
-	@IBAction func IBbtnPlayTap(sender: UIButton) {
-		sender.selected = !sender.selected
-		sender.selected ? startPlaying() : stopPlaying()
+	@IBAction func IBbtnPlayTap(_ sender: UIButton) {
+		sender.isSelected = !sender.isSelected
+		sender.isSelected ? startPlaying() : stopPlaying()
 		
 	}
 	
